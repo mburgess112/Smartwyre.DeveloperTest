@@ -125,31 +125,78 @@ namespace Smartwyre.DeveloperTest.Tests
                 Times.Never);
         }
 
-        [Fact]
-        public void Calculate_FixedCash_ValidData_ReturnsSuccess_StoresExpectedRebate()
+        [Theory]
+        [MemberData(nameof(ValidRebateTests))]
+        public void Calculate_ValidData_ReturnsSuccess_StoresExpectedRebate(ValidRebateTestCase testCase)
         {
             _mockRebateDataStore.Setup(x => x.GetRebate(SampleRebateId))
-                .Returns(new Rebate
-                {
-                    Incentive = IncentiveType.FixedCashAmount,
-                    Amount = 10
-                });
+                .Returns(testCase.Rebate);
             _mockProductDataStore.Setup(x => x.GetProduct(SampleProductId))
-                .Returns(new Product
-                {
-                    SupportedIncentives = SupportedIncentiveType.FixedCashAmount,
-                });
+                .Returns(testCase.Product);
 
             var request = new CalculateRebateRequest
             {
                 ProductIdentifier = SampleProductId,
-                RebateIdentifier = SampleRebateId
+                RebateIdentifier = SampleRebateId,
+                Volume = 10
             };
             var result = _rebateService.Calculate(request);
 
             result.Success.Should().BeTrue();
             _mockRebateDataStore.Verify(
-                x => x.StoreCalculationResult(It.IsAny<Rebate>(), 10M));
+                x => x.StoreCalculationResult(testCase.Rebate, testCase.ExpectedAmount));
+        }
+
+        public static TheoryData<ValidRebateTestCase> ValidRebateTests =>
+            [
+                new()
+                {
+                    Product = new Product
+                    {
+                        SupportedIncentives = SupportedIncentiveType.FixedCashAmount,
+                    },
+                    Rebate = new Rebate
+                    {
+                        Incentive = IncentiveType.FixedCashAmount,
+                        Amount = 10
+                    },
+                    ExpectedAmount = 10
+                },
+                new()
+                {
+                    Product = new Product
+                    {
+                        SupportedIncentives = SupportedIncentiveType.FixedRateRebate,
+                        Price = 30
+                    },
+                    Rebate = new Rebate
+                    {
+                        Incentive = IncentiveType.FixedRateRebate,
+                        Percentage = 0.05M
+                    },
+                    ExpectedAmount = 15
+                },
+                new()
+                {
+                    Product = new Product
+                    {
+                        SupportedIncentives = SupportedIncentiveType.AmountPerUom,
+                        Price = 30
+                    },
+                    Rebate = new Rebate
+                    {
+                        Incentive = IncentiveType.AmountPerUom,
+                        Amount = 7
+                    },
+                    ExpectedAmount = 70
+                }
+            ];
+
+        public class ValidRebateTestCase
+        {
+            public Product Product { get; init; }
+            public Rebate Rebate { get; init; }
+            public decimal ExpectedAmount { get; init; }
         }
     }
 }
