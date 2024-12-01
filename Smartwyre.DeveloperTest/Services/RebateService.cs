@@ -5,13 +5,21 @@ namespace Smartwyre.DeveloperTest.Services;
 
 public class RebateService : IRebateService
 {
+    private readonly IProductDataStore _productDataStore;
+    private readonly IRebateDataStore _rebateDataStore;
+
+    public RebateService(
+        IProductDataStore productDataStore,
+        IRebateDataStore rebateDataStore) 
+    {
+        _productDataStore = productDataStore;
+        _rebateDataStore = rebateDataStore;
+    }
+
     public CalculateRebateResult Calculate(CalculateRebateRequest request)
     {
-        var rebateDataStore = new RebateDataStore();
-        var productDataStore = new ProductDataStore();
-
-        Rebate rebate = rebateDataStore.GetRebate(request.RebateIdentifier);
-        Product product = productDataStore.GetProduct(request.ProductIdentifier);
+        Rebate rebate = _rebateDataStore.GetRebate(request.RebateIdentifier);
+        Product product = _productDataStore.GetProduct(request.ProductIdentifier);
 
         var result = new CalculateRebateResult();
 
@@ -90,8 +98,10 @@ public class RebateService : IRebateService
 
         if (result.Success)
         {
-            var storeRebateDataStore = new RebateDataStore();
-            storeRebateDataStore.StoreCalculationResult(rebate, rebateAmount);
+            // This was originally a separately-created object from the rebate store used for reading
+            // There doesn't seem to be a big reason for doing this, but if we wanted it we could
+            // segregate the interface.
+            _rebateDataStore.StoreCalculationResult(rebate, rebateAmount);
         }
 
         return result;
