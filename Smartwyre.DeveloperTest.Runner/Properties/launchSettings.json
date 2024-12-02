@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Smartwyre.DeveloperTest.Runner": {
+      "commandName": "Project",
+      "commandLineArgs": "\"product1\" \"rebate1\" 30"
+    }
+  }
+}
