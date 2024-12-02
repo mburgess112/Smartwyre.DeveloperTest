@@ -1,4 +1,4 @@
-﻿using Smartwyre.DeveloperTest.Types;
+﻿using Smartwyre.DeveloperTest.Types.Rebates;
 
 namespace Smartwyre.DeveloperTest.Data
 {

@@ -5,8 +5,7 @@ using Moq;
 using Smartwyre.DeveloperTest.Data;
 using Smartwyre.DeveloperTest.Services;
 using Smartwyre.DeveloperTest.Types;
-
-using System.Collections.Generic;
+using Smartwyre.DeveloperTest.Types.Rebates;
 
 using Xunit;
 
@@ -55,7 +54,7 @@ namespace Smartwyre.DeveloperTest.Tests
         public void Calculate_HasNullProduct_ReturnsNoSuccess_DoesNotStoreData()
         {
             _mockRebateDataStore.Setup(x => x.GetRebate(SampleRebateId))
-                .Returns(new Rebate());
+                .Returns(new FixedCashAmountRebate());
             _mockProductDataStore.Setup(x => x.GetProduct(SampleProductId))
                 .Returns((Product)null);
 
@@ -76,9 +75,8 @@ namespace Smartwyre.DeveloperTest.Tests
         public void Calculate_FixedCash_NotSupported_ReturnsNoSuccess_DoesNotStoreData()
         {
             _mockRebateDataStore.Setup(x => x.GetRebate(SampleRebateId))
-                .Returns(new Rebate
+                .Returns(new FixedCashAmountRebate
                 {
-                    Incentive = IncentiveType.FixedCashAmount,
                     Amount = 10
                 });
             _mockProductDataStore.Setup(x => x.GetProduct(SampleProductId))
@@ -101,9 +99,8 @@ namespace Smartwyre.DeveloperTest.Tests
         public void Calculate_FixedCash_HasZeroAmount_ReturnsNoSuccess_DoesNotStoreData()
         {
             _mockRebateDataStore.Setup(x => x.GetRebate(SampleRebateId))
-                .Returns(new Rebate
+                .Returns(new FixedCashAmountRebate
                 {
-                    Incentive = IncentiveType.FixedCashAmount,
                     Amount = 0
                 });
             _mockProductDataStore.Setup(x => x.GetProduct(SampleProductId))
@@ -155,9 +152,8 @@ namespace Smartwyre.DeveloperTest.Tests
                     {
                         SupportedIncentives = SupportedIncentiveType.FixedCashAmount,
                     },
-                    Rebate = new Rebate
+                    Rebate = new FixedCashAmountRebate
                     {
-                        Incentive = IncentiveType.FixedCashAmount,
                         Amount = 10
                     },
                     ExpectedAmount = 10
@@ -169,9 +165,8 @@ namespace Smartwyre.DeveloperTest.Tests
                         SupportedIncentives = SupportedIncentiveType.FixedRateRebate,
                         Price = 30
                     },
-                    Rebate = new Rebate
+                    Rebate = new FixedRateRebate
                     {
-                        Incentive = IncentiveType.FixedRateRebate,
                         Percentage = 0.05M
                     },
                     ExpectedAmount = 15
@@ -183,9 +178,8 @@ namespace Smartwyre.DeveloperTest.Tests
                         SupportedIncentives = SupportedIncentiveType.AmountPerUom,
                         Price = 30
                     },
-                    Rebate = new Rebate
+                    Rebate = new AmountPerUomRebate
                     {
-                        Incentive = IncentiveType.AmountPerUom,
                         Amount = 7
                     },
                     ExpectedAmount = 70

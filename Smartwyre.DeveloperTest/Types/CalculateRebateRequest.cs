@@ -1,6 +1,6 @@
 ﻿namespace Smartwyre.DeveloperTest.Types;
 
-public class CalculateRebateRequest
+public record CalculateRebateRequest
 {
     public string RebateIdentifier { get; set; }
 
